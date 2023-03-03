@@ -16,22 +16,46 @@
       const image = new Image();
       image.src = event.target!.result as string;
       image.onload = function() {
-        const frame = createFrame(image.width, image.height);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const shadowOffset = 30;
-        canvas.width = frame.width + shadowOffset * 2;
-        canvas.height = frame.height + shadowOffset * 2;
+        const borderWidth = 10;
+        const topBarHeight = 30;
+        const borderRadius = 10;
+        const canvasWidth = image.width + shadowOffset * 2 + borderWidth * 2;
+        const canvasHeight = image.height + shadowOffset * 2 + borderWidth + topBarHeight + borderRadius;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
 
-        // Add shadow
+        // Draw border shadow
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
         ctx.shadowOffsetX = shadowOffset;
         ctx.shadowOffsetY = shadowOffset;
         ctx.shadowBlur = 30;
 
-        // Draw image and frame on canvas
-        ctx.drawImage(image, 0, 0, image.width, image.height);
-        ctx.drawImage(frame, shadowOffset, shadowOffset, frame.width, frame.height);
+        // Draw window background
+        const gradient = ctx.createLinearGradient(0, 0, 0, topBarHeight);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(shadowOffset + borderWidth, shadowOffset + borderWidth, image.width, topBarHeight);
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.moveTo(shadowOffset + borderWidth + borderRadius, shadowOffset + borderWidth + topBarHeight);
+        ctx.lineTo(shadowOffset + borderWidth + image.width - borderRadius, shadowOffset + borderWidth + topBarHeight);
+        ctx.quadraticCurveTo(shadowOffset + borderWidth + image.width, shadowOffset + borderWidth + topBarHeight, shadowOffset + borderWidth + image.width, shadowOffset + borderWidth + topBarHeight + borderRadius);
+        ctx.lineTo(shadowOffset + borderWidth + image.width, shadowOffset + borderWidth + image.height + topBarHeight - borderRadius);
+        ctx.quadraticCurveTo(shadowOffset + borderWidth + image.width, shadowOffset + borderWidth + image.height + topBarHeight, shadowOffset + borderWidth + image.width - borderRadius, shadowOffset + borderWidth + image.height + topBarHeight);
+        ctx.lineTo(shadowOffset + borderWidth + borderRadius, shadowOffset + borderWidth + image.height + topBarHeight);
+        ctx.quadraticCurveTo(shadowOffset + borderWidth, shadowOffset + borderWidth + image.height + topBarHeight, shadowOffset + borderWidth, shadowOffset + borderWidth + image.height + topBarHeight - borderRadius);
+        ctx.lineTo(shadowOffset + borderWidth, shadowOffset + borderWidth + topBarHeight + borderRadius);
+        ctx.quadraticCurveTo(shadowOffset + borderWidth, shadowOffset + borderWidth + topBarHeight, shadowOffset + borderWidth + borderRadius, shadowOffset + borderWidth + topBarHeight);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw image
+        ctx.drawImage(image, shadowOffset + borderWidth, shadowOffset + borderWidth + topBarHeight, image.width, image.height);
 
         const url = canvas.toDataURL('image/png');
         imageUrl.set(url);
