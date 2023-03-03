@@ -1,8 +1,6 @@
-<!-- App.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
-  import { createFrame } from '../utils/utils';
 
   const file = writable<File | null>(null);
   const imageUrl = writable<string>('');
@@ -40,7 +38,8 @@
         ctx.fillStyle = gradient;
         ctx.fillRect(shadowOffset + borderWidth, shadowOffset + borderWidth, image.width, topBarHeight);
         ctx.shadowColor = 'transparent';
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = '#FFF';
+
         ctx.beginPath();
         ctx.moveTo(shadowOffset + borderWidth + borderRadius, shadowOffset + borderWidth + topBarHeight);
         ctx.lineTo(shadowOffset + borderWidth + image.width - borderRadius, shadowOffset + borderWidth + topBarHeight);
@@ -56,6 +55,30 @@
 
         // Draw image
         ctx.drawImage(image, shadowOffset + borderWidth, shadowOffset + borderWidth + topBarHeight, image.width, image.height);
+
+        // Draw three round buttons on the top bar
+        const buttonRadius = 8;
+        const buttonSpacing = 6;
+        const buttonX = shadowOffset + borderWidth + buttonSpacing;
+        const buttonY = shadowOffset + borderWidth + buttonSpacing;
+
+        // Red button
+        ctx.beginPath();
+        ctx.fillStyle = '#FF5F57';
+        ctx.arc(buttonX, buttonY, buttonRadius, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Yellow button
+        ctx.beginPath();
+        ctx.fillStyle = '#FFC74A';
+        ctx.arc(buttonX + buttonRadius + buttonSpacing, buttonY, buttonRadius, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Green button
+        ctx.beginPath();
+        ctx.fillStyle = '#32D74B';
+        ctx.arc(buttonX + (buttonRadius + buttonSpacing) * 2, buttonY, buttonRadius, 0, 2 * Math.PI);
+        ctx.fill();
 
         const url = canvas.toDataURL('image/png');
         imageUrl.set(url);
@@ -102,10 +125,6 @@
   #drop-area {
     border: 5px dashed #ccc;
     padding: 20px;
-  }
-
-  #drop-area.drag-enter {
-    background-color: #f0f0f0;
   }
 
   img {
